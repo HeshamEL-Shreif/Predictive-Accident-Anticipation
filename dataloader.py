@@ -119,7 +119,7 @@ def load_data(data_path, transform=transform, n_frames=100, fps=10, batch_size=1
 
   data_loader = torch.utils.data.DataLoader(video_dataset, batch_size=batch_size, shuffle=shuffle)
   del video_dataset
-  torch.save(data_loader, '/content/drive/MyDrive/dataset feature file/dataset_data_loader.pth')
+  torch.save(data_loader, 'dataset_data_loader.pth')
   return data_loader
 
 # load dataloader object from files

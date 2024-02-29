@@ -55,7 +55,7 @@ def object_level_feature_extraction(feature_extractor, object_detector, data_loa
                                                     dataset_labels,
                                                     batch_size,
                                                     shuffle)
-      torch.save(object_feature_dataloader, '/content/drive/MyDrive/dataset feature file/object_feature_dataloader.pth')
+      torch.save(object_feature_dataloader, 'object_feature_dataloader.pth')
     return object_feature_dataloader
 
 

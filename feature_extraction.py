@@ -74,6 +74,6 @@ def frame_level_feature_extraction(feature_extractor, data_loader, batch_size = 
                                              dataset_labels,
                                              batch_size,
                                              shuffle)
-     torch.save(features_dataloader, '/content/drive/MyDrive/dataset feature file/frame_features_dataloader.pth')
+     torch.save(features_dataloader, 'frame_features_dataloader.pth')
     return features_dataloader
 
