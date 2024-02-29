@@ -1,12 +1,7 @@
-
-import os
 import torch
-import cv2
 import torch.nn as nn
 from torchvision import transforms
 import torch.backends.cudnn as cudnn
-import numpy as np
-import torchvision
 import matplotlib.pyplot as plt
 from PIL import Image
 from dataloader import *
