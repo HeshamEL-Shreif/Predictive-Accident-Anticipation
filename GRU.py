@@ -15,5 +15,5 @@ class  GatedRecurrentUnit(nn.Module):
         out, h = self.gru(x_t, h_t_prev)
         out = self.relu(self.dense1(out))
         out = self.dense2(out)
+        out = nn.Softmax()(out)
         return out, h
-    
