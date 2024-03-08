@@ -10,7 +10,7 @@ class DSTA(nn.Module):
         self.dsa = SpatialAttention(device, n_layers, d)
         self.dta = TemporalAttention(device, d)
         self.gru = GatedRecurrentUnit(device, input_dim, d, output_dim, n_layers)
-        self.h_prev_weighted = torch.randn((4096), device=device)
+        self.h_prev_weighted = torch.randn((d), device=device) * 0.01
         self.h_t_prev = torch.zeros((m, d), device=device)
     
     def forward(self, f_t, o_t):
@@ -22,7 +22,7 @@ class DSTA(nn.Module):
         self.h_t_prev[0] = h
         beta_t = self.dta(self.h_t_prev.permute(1, 0))
         self.h_prev_weighted = torch.sum((self.h_t_prev.permute(1, 0) * beta_t), dim=1)
-        return out
+        return out, h
 
 
 

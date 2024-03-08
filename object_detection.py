@@ -60,4 +60,17 @@ def object_level_feature_extraction(feature_extractor, object_detector, data_loa
 
 
 
+def object_feature(device, feature_extractor, object_detector, frame, n_objects=5):
+    frame = yolov8_transform(frame)
+    results = object_detector(frame.unsqueeze(0), max_det=n_objects, save_crop=True)
+    cropped_regions = torch.zeros((n_objects, feature_extractor.dim_feat))
+    for result in results:
+      boxes = result.boxes
+      for i, box in enumerate(boxes.xyxy):
+        x1, y1, x2, y2 = box
+        cropped_region = frame[ :, int(y1.item()): int(y2.item()), int(x1.item()):int(x2.item())]
+        cropped_region = cropped_region.unsqueeze(0)
+        cropped_region = feature_extractor(cropped_region.to(device))
+        cropped_regions[i] = cropped_region
+    return cropped_regions
 

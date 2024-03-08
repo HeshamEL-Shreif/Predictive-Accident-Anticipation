@@ -4,15 +4,10 @@ import torch
 import cv2
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
-import torch.backends.cudnn as cudnn
-import numpy as np
-import torchvision
-import matplotlib.pyplot as plt
 from torchvision.transforms import ToTensor
 from torchvision import transforms
 from PIL import Image
-cudnn.benchmark = True
-plt.ion()
+
 
 
 class VideoFramesDataset(Dataset):
@@ -150,3 +145,101 @@ def list_to_dataloader(data, labels, batch_size, shuffle):
   dataset = ListToDataSet(data, labels)
   dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
   return dataloader
+
+
+#dataloader for CCD dataset
+class CarCrashDatasetLoader(Dataset):
+    def __init__(self, data_path, annote_path, transform=None):
+        self.data_path = data_path
+        self.classes = ['Normal', 'Crash']
+        self.class_to_idx = {cls_name: idx for idx, cls_name in enumerate(self.classes)}
+        self.idx_to_class = {idx: cls_name for cls_name, idx in self.class_to_idx.items()}
+        self.annotation_path = annote_path
+        self.data_dict = self._parse_annotation_file()
+        self.normal_vid_frames = [[1, 0] for _ in range(50)]
+        self.samples = self._make_dataset()
+        self.transform = transform or ToTensor()
+        print(f"dataset with {len(self.classes)} {self.classes[0]} : {self.class_to_idx[self.classes[0]]}. {self.classes[1]} : {self.class_to_idx[self.classes[1]]}")
+
+    def _make_dataset(self):
+        samples = []
+        
+        for class_folder in self.classes:
+            class_path = os.path.join(self.data_path, class_folder)
+            if not os.path.isdir(class_path):
+                continue
+
+            class_idx = self.class_to_idx[class_folder]
+
+            for video_file in os.listdir(class_path):
+                video_path = os.path.join(class_path, video_file)
+                if not os.path.isfile(video_path):
+                    continue
+                label = torch.zeros(2)
+                label[class_idx] = 1
+                if class_folder == 'Crash':
+                  frames_label = self.data_dict[video_file]
+                else:
+                  frames_label = torch.tensor(self.normal_vid_frames)
+
+                samples.append((video_path, label, frames_label))
+
+        return samples
+
+    def _parse_annotation_file(self):
+        data_dict = {}
+        with open(self.annotation_path, 'r') as f:
+            for line in f:
+                parts = line.strip().split(',')
+                vidname = parts[0]
+                binlabels = parts[1]
+                binlabels = [int(label) for label in binlabels]
+                binlabels = [[1, 0] if label == 0 else [0, 1] for label in binlabels]
+                binlabels = torch.tensor(binlabels) 
+                data_dict[vidname] = binlabels
+        return data_dict
+
+    def __len__(self):
+        return len(self.samples)
+
+    def _read_frames(self, video_path):
+        cap = cv2.VideoCapture(video_path)
+
+        frames = []
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = Image.fromarray(frame)
+
+            if self.transform:
+                frame = self.transform(frame)
+            else:
+                frame = ToTensor()(frame)
+
+            frames.append(frame)
+            del frame
+
+        cap.release()
+        del cap
+
+        return torch.stack(frames)
+
+    def __getitem__(self, idx):
+        video_path, label, frames_label = self.samples[idx]
+        frames = self._read_frames(video_path)
+
+        return frames, label, frames_label
+    
+
+def ccd_load_data(data_path,  annote_path, transform=transform, batch_size=1, shuffle=False):
+  
+  video_dataset = CarCrashDatasetLoader(data_path,
+                                      annote_path,
+                                     transform=transform)
+  data_loader = torch.utils.data.DataLoader(video_dataset, batch_size=batch_size, shuffle=shuffle)
+  del video_dataset
+  torch.save(data_loader, 'CCD_dataset_data_loader.pth')
+  return data_loader

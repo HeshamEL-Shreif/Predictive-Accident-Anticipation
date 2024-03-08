@@ -1,13 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, Dataset
-from torchvision import datasets, models, transforms
-import torch.backends.cudnn as cudnn
-import numpy as np
-import torchvision
-import matplotlib.pyplot as plt
-from torchvision.transforms import ToTensor
-from PIL import Image
+from torchvision import  models, transforms
 from dataloader import *
 
 
