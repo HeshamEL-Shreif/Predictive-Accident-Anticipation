@@ -84,6 +84,7 @@ def validation(dsta, tsaa, data_loader, device):
     correct_predictions = 0
     epoch_loss = 0.0
     loss_fn = nn.CrossEntropyLoss()
+    total_loss = 0.0
 
     with torch.no_grad():  # Disable gradient calculation for validation
         for batch in data_loader:
@@ -106,23 +107,15 @@ def validation(dsta, tsaa, data_loader, device):
             frame_accuracy = 100.0 * correctss / total_frames
             print(f'{datetime.datetime.now()}  Frames Level Loss: {loss_frame:.4f}, Frames Level Accuracy: {frame_accuracy:.4f}')
 
-            t_pred = tsaa(h.squeeze(1).to(device))
-            loss_vid = loss_fn(t_pred.unsqueeze(0), V_label.to(device))
-            total_loss = loss1 + 15 * loss_vid
-
-            # Calculate validation accuracy
-            _, predicted = torch.max(t_pred.data, 1)
-            correct_predictions += (predicted == V_label).sum().item()
-            total_samples += V_label.size(0)
-
-            # Accumulate epoch loss
-            epoch_loss += total_loss.item()
+            total_loss += loss_frame
+            correct_predictions += correctss
+            total_samples += total_frames
 
     # Calculate average validation loss and accuracy
-    avg_epoch_loss = epoch_loss / len(data_loader)
+    avg_epoch_loss = total_loss / len(data_loader)
     accuracy = correct_predictions / total_samples
 
-    print(f'Validation Loss: {avg_epoch_loss:.4f}, Validation Accuracy: {accuracy:.4f}')
+    print(f'Validation Total Loss: {avg_epoch_loss:.4f}, Validation Total Accuracy: {accuracy:.4f}')
 
 # Training loop with validation
 def train_with_validation(n_epochs, dsta, tsaa, optimizer_dsta, optimizer_tsaa, train_loader, val_loader, device):
