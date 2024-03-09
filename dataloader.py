@@ -155,15 +155,15 @@ class CarCrashDatasetLoader(Dataset):
         self.class_to_idx = {cls_name: idx for idx, cls_name in enumerate(self.classes)}
         self.idx_to_class = {idx: cls_name for cls_name, idx in self.class_to_idx.items()}
         self.annotation_path = annote_path
-        self.data_dict = self._parse_annotation_file()
+        self.data_dict, self.toa = self._parse_annotation_file()
         self.normal_vid_frames = [[1, 0] for _ in range(50)]
         self.samples = self._make_dataset()
         self.transform = transform or ToTensor()
-        print(f"dataset with {len(self.classes)} {self.classes[0]} : {self.class_to_idx[self.classes[0]]}. {self.classes[1]} : {self.class_to_idx[self.classes[1]]}")
+        print(f"dataset with {len(self.classes)} classes {self.classes[0]} : {self.class_to_idx[self.classes[0]]}. {self.classes[1]} : {self.class_to_idx[self.classes[1]]}")
 
     def _make_dataset(self):
         samples = []
-        
+
         for class_folder in self.classes:
             class_path = os.path.join(self.data_path, class_folder)
             if not os.path.isdir(class_path):
@@ -178,26 +178,28 @@ class CarCrashDatasetLoader(Dataset):
                 label = torch.zeros(2)
                 label[class_idx] = 1
                 if class_folder == 'Crash':
-                  frames_label = self.data_dict[video_file]
+                  frames_label = self.data_dict[video_file.replace(".mp4", "")]
                 else:
                   frames_label = torch.tensor(self.normal_vid_frames)
 
-                samples.append((video_path, label, frames_label))
+                samples.append((video_path, label, frames_label, self.toa))
 
         return samples
 
     def _parse_annotation_file(self):
         data_dict = {}
+        mapping_table = str.maketrans({'[': '', ']': ''})
         with open(self.annotation_path, 'r') as f:
             for line in f:
-                parts = line.strip().split(',')
+                parts = line.strip().translate(mapping_table).split(',')
                 vidname = parts[0]
-                binlabels = parts[1]
-                binlabels = [int(label) for label in binlabels]
+                binlabels = parts[1:51]
+                binlabels = [int(x) for x in binlabels]
+                index = binlabels.index(1) + 1
                 binlabels = [[1, 0] if label == 0 else [0, 1] for label in binlabels]
-                binlabels = torch.tensor(binlabels) 
-                data_dict[vidname] = binlabels
-        return data_dict
+                binlabels_tensors = [torch.tensor(chunk) for chunk in binlabels]
+                data_dict[vidname] = binlabels_tensors
+        return data_dict, index
 
     def __len__(self):
         return len(self.samples)
@@ -228,11 +230,10 @@ class CarCrashDatasetLoader(Dataset):
         return torch.stack(frames)
 
     def __getitem__(self, idx):
-        video_path, label, frames_label = self.samples[idx]
+        video_path, label, frames_label, toa = self.samples[idx]
         frames = self._read_frames(video_path)
 
-        return frames, label, frames_label
-    
+        return frames, torch.tensor(label), torch.tensor(frames_label), toa
 
 def ccd_load_data(data_path,  annote_path, transform=transform, batch_size=1, shuffle=False):
   
