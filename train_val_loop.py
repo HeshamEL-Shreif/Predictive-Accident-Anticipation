@@ -4,12 +4,13 @@ import torch.nn as nn
 from exp_loss_function import exp_loss
 
 
-import datetime
 
 def training(n_epochs, dsta, tsaa,  optimizer_dsta, optimizer_tsaa, data_loader, device, update_grad_on_all_data=False):
     t = [i for i in range(1, 51)]
     t = torch.tensor(t).to(device)
     loss_fn = nn.CrossEntropyLoss()
+    best_loss = float('inf')
+    best_epoch = 0
 
 
     for epoch in range(1, n_epochs + 1):
@@ -75,8 +76,34 @@ def training(n_epochs, dsta, tsaa,  optimizer_dsta, optimizer_tsaa, data_loader,
         accuracy = correct_predictions / total_samples
 
         print(f'{datetime.datetime.now()} Epoch [{epoch}/{n_epochs}], Training Loss: {avg_epoch_loss:.4f}, Training Accuracy: {accuracy:.4f}')
+        if epoch % 1 == 0:  # You can adjust this based on your preference
+        # Save the last model checkpoint
+            torch.save({
+                'epoch': epoch,
+                'dsta_state_dict': dsta.state_dict(),
+                'tsaa_state_dict': tsaa.state_dict(),
+                'optimizer_dsta_state_dict': optimizer_dsta.state_dict(),
+                'optimizer_tsaa_state_dict': optimizer_tsaa.state_dict(),
+                'loss': avg_epoch_loss,
+            }, f'last_checkpoint.pth')
 
-def validation(dsta, tsaa, data_loader, device):
+        # Save the best model checkpoint
+        if avg_epoch_loss < best_loss:
+            best_loss = avg_epoch_loss
+            best_epoch = epoch
+            torch.save({
+                'epoch': epoch,
+                'dsta_state_dict': dsta.state_dict(),
+                'tsaa_state_dict': tsaa.state_dict(),
+                'optimizer_dsta_state_dict': optimizer_dsta.state_dict(),
+                'optimizer_tsaa_state_dict': optimizer_tsaa.state_dict(),
+                'loss': avg_epoch_loss,
+            }, f'best_checkpoint.pth')
+
+# After training, you can load the best model checkpoint if needed
+    print(f"Best model achieved at Epoch {best_epoch}, with Loss: {best_loss:.4f}")
+
+def validation(dsta, data_loader, device):
     t = [i for i in range(1, 51)]
     t = torch.tensor(t).to(device)
     dsta.eval()  # Set model to evaluation mode
@@ -179,6 +206,6 @@ def train_with_validation(n_epochs, dsta, tsaa, optimizer_dsta, optimizer_tsaa, 
 
         # Run validation
         print("Validation:")
-        validation(dsta, tsaa, val_loader, device)
+        validation(dsta, val_loader, device)
 
 
