@@ -47,17 +47,7 @@ device = torch.device('cuda')
 num_epochs = 8
 start_epoch = 0
 
-# Initialize Model, Scheduler, losses and optimizer and continue training
-
-dsta = DSTA(device=torch.device('cuda'), d=512, m=5, input_dim=512+512, output_dim=2, n_layers=1, t=50, n_objects=12)
-dsta.load_state_dict(torch.load('path/to/best')['dsta_state_dict'])
-tsaa_loss_fn = nn.CrossEntropyLoss()
-optimizer_dsta = torch.optim.Adam(params=dsta.parameters(), lr=0.0001)
-optimizer_dsta.load_state_dict(torch.load('path/to/best')['optimizer_dsta_state_dict'])
-scheduler_dsta = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer_dsta, 'min')
-device = torch.device('cuda')
-start_epoch = torch.load('path/to/best')['epoch']
-num_epochs = 10
+# Train Model
 
 training_val(start_epoch=start_epoch,
          n_epochs=num_epochs,

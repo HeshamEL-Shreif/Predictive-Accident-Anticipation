@@ -12,4 +12,30 @@ These extracted features, a fusion of frame and object specifics, undergo meticu
 The Dynamic Temporal Attention (DTA) module meticulously analyzes historical representations, assigning attention weights to decode temporal sequences, thereby aiding in predicting potential accident occurrences. Simultaneously, the Dynamic Spatial Attention (DSA) module learns to allocate attention weights, ensuring the precise fusion of object-level features with utmost precision and relevance.
 Moreover, the Temporal Self-Attention Aggregation (TSAA) auxiliary network plays a critical role in discerning and predicting video classes exclusively during the training phase. This intricate orchestration within the DSTA network establishes the backbone of its predictive capabilities, meticulously detailed in forthcoming sections
 
+###  Dataset
+<ul>
+<li>We train the model using <a href="https://drive.google.com/drive/folders/1NUwC-bkka0-iPqhEhIgsXWtj0DA2MR-F?usp=share_link" >CCD(Car Crash Dataset)</a>
+<li>To intiate dataloader you will use ccd_load_data function and give it the path of the dataset and the path of <a href="https://drive.google.com/file/d/13OgrD0-8cKG0X00MlA6JXr0G_JJmHYXg/view?usp=share_link">anotate file</a> 
+
+</ul>
+
+### Model Training & Testing
+<ul>
+<li> To start training from scratch run the train_DSTA.py File
+<li>  To continue training from checkpoint run the cont_train_from_chechpoint.py file and change the path of the checkpoint file in the code
+<li> To test the model run the test_model.py file and change the path of the checkpoint file in the code and the path of video to test on it or use it throw the user interface by running the index.html file
+</ul>
+
+#### YOLOv9 
+<ul>
+<li>YOLOv9 trained on a custom dataset manually anotated on roboflow  <br>
+<a href="https://universe.roboflow.com/accident-anticipating/accident-anticipation">
+    <img src="https://app.roboflow.com/images/download-dataset-badge.svg"></img>
+</a>
+<li> YOLOv9 Notebook included in the repository
+<li> YOLOv9 weights included on the <a href="https://drive.google.com/file/d/153UJCTQEPKjp_sfvN3ygqQahHTXX60jc/view?usp=share_link">drive</a>
+</ul>
+
+
+
 
