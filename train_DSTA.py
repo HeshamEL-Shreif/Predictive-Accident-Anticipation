@@ -7,6 +7,7 @@ from torchvision import transforms
 from Test_loop import *
 from dataloader import *
 from feature_extraction import *
+from train_val_loop import *
 from DSTA import *
 plt.ion()
 
@@ -58,7 +59,6 @@ device = torch.device('cuda')
 start_epoch = torch.load('path/to/best')['epoch']
 num_epochs = 10
 
-'''
 training_val(start_epoch=start_epoch,
          n_epochs=num_epochs,
          dsta=dsta,
@@ -68,11 +68,3 @@ training_val(start_epoch=start_epoch,
          data_loader=train_loader,
          val_data_loader=val_loader,
          device=device)
-'''
-
-# Test Model
-
-dsta.load_state_dict(torch.load('path/to/best')['dsta_state_dict'])
-dsta.eval()
-out = test_DSTA_model(video_path='patt/to/test/video', video_class=1,
-           model=dsta, device=device, transform=transform)
