@@ -16,14 +16,23 @@ Moreover, the Temporal Self-Attention Aggregation (TSAA) auxiliary network plays
 <ul>
 <li>We train the model using <a href="https://drive.google.com/drive/folders/1NUwC-bkka0-iPqhEhIgsXWtj0DA2MR-F?usp=share_link" >CCD(Car Crash Dataset)</a>
 <li>To intiate dataloader you will use ccd_load_data function and give it the path of the dataset and the path of <a href="https://drive.google.com/file/d/13OgrD0-8cKG0X00MlA6JXr0G_JJmHYXg/view?usp=share_link">anotate file</a> 
+<li> dataset must be in the following structure<br>
+  CarCrash<br>
+  |<br>
+    --> Normal (folder includes the Normal videos) <br>
+  |<br>
+    --> Crash (folder includes videos that contains an accident)
 
 </ul>
 
 ### Model Training & Testing
 <ul>
+<li>check the path of the YOLOv9 weights in DSTA.py
+<li>check the path of the dataset in train_DSTA.py and cont_train_from_chechpoint.py
 <li> To start training from scratch run the train_DSTA.py File
 <li>  To continue training from checkpoint run the cont_train_from_chechpoint.py file and change the path of the checkpoint file in the code
 <li> To test the model run the test_model.py file and change the path of the checkpoint file in the code and the path of video to test on it or use it throw the user interface by running the index.html file
+<li> Videos to test DSTA on it found in <a href="https://drive.google.com/drive/folders/1ILrw5lAQRBWUN7sh6hHQcgV-2mpAJIUe?usp=share_link">drive</a>
 </ul>
 
 #### YOLOv9 

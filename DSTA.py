@@ -11,7 +11,7 @@ from feature_extraction import init_feature_extractor
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 object_detector = YOLO('yolov9e.pt')  # load an official model
-object_detector = YOLO('/content/drive/MyDrive/yolov9/best.pt')
+object_detector = YOLO('https://drive.google.com/file/d/153UJCTQEPKjp_sfvN3ygqQahHTXX60jc/view?usp=share_link')
 feature_extractor = init_feature_extractor(backbone='efficientnet', device=torch.device('cuda'))
 
 
