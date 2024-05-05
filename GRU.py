@@ -29,13 +29,13 @@ class  GatedRecurrentUnit(nn.Module):
       self.hidden_dim = hidden_dim
       self.n_layers = n_layers
       self.gru = nn.GRU(input_dim, hidden_dim, n_layers, batch_first=True, device=device)
-      self.dense1 = torch.nn.Linear(hidden_dim, 64, device=device, dtype=torch.bfloat16)
-      self.dense2 = torch.nn.Linear(64, output_dim, device=device, dtype=torch.bfloat16)
+      self.dense1 = torch.nn.Linear(hidden_dim, 64, device=device, dtype=torch.float32)
+      self.dense2 = torch.nn.Linear(64, output_dim, device=device, dtype=torch.float32)
       self.relu = nn.ReLU()
 
   def forward(self, h_t_prev, x_t):
       out, h = self.gru(x_t, h_t_prev)
-      out = self.relu(self.dense1(out.to(torch.bfloat16)))
+      out = self.relu(self.dense1(out.to(torch.float32)))
       out = self.dense2(out)
       out = nn.Softmax(dim=-1)(out)
-      return out, h.to(torch.bfloat16)
+      return out, h.to(torch.float32)

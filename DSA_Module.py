@@ -20,10 +20,10 @@ class SpatialAttention(nn.Module):
   '''
   def __init__(self, device, n_layers, d):
     super().__init__()
-    self.wsa =  nn.Parameter(torch.randn((d), requires_grad=True, device=device, dtype=torch.bfloat16) * 0.01)
-    self.wg =  nn.Parameter(torch.randn((d, d), requires_grad=True, device=device, dtype=torch.bfloat16) * 0.01)
-    self.w_theta =  nn.Parameter(torch.randn((d, d), requires_grad=True, device=device, dtype=torch.bfloat16) * 0.01)
-    self.b_theta =  nn.Parameter(torch.zeros((n_layers, d), requires_grad=True, device=device, dtype=torch.bfloat16))
+    self.wsa =  nn.Parameter(torch.randn((d), requires_grad=True, device=device, dtype=torch.float32) * 0.01)
+    self.wg =  nn.Parameter(torch.randn((d, d), requires_grad=True, device=device, dtype=torch.float32) * 0.01)
+    self.w_theta =  nn.Parameter(torch.randn((d, d), requires_grad=True, device=device, dtype=torch.float32) * 0.01)
+    self.b_theta =  nn.Parameter(torch.zeros((n_layers, d), requires_grad=True, device=device, dtype=torch.float32))
 
   def forward(self, ot, h_prev_weighted):
      alpha_t = torch.matmul(h_prev_weighted, self.wg)

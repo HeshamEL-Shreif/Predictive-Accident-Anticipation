@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 def evaluation(all_pred, all_labels, time_of_accidents, fps=20.0):
     """

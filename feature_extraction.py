@@ -34,7 +34,7 @@ class VGG16(nn.Module):
       output = self.classifier(output)
       return output
   
-  def init_feature_extractor(backbone='vgg16', device=torch.device('cuda')):
+def init_feature_extractor(backbone='vgg16', device=torch.device('cuda')):
     '''
     description:
       function to initiate feature extractor

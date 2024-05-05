@@ -20,7 +20,7 @@ class SelfAttentionAggregation(nn.Module):
     """
     def __init__(self, device, t, d):
         super().__init__()
-        self.w_saa =  nn.Parameter(torch.randn((1, t), device=device, requires_grad=True, dtype=torch.bfloat16) * 0.01)
+        self.w_saa =  nn.Parameter(torch.randn((1, t), device=device, requires_grad=True, dtype=torch.float32) * 0.01)
         self.dense1 = nn.Linear(d, 64, device=device, dtype=torch.bfloat16)
         self.dense2 = nn.Linear(64, 2, device=device, dtype=torch.bfloat16)
 

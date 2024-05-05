@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 def exp_loss(pred, target, time, toa, fps=10.0):
     """

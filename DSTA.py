@@ -7,12 +7,13 @@ from object_detection import object_feature
 from TSAA_Module import *
 from ultralytics import YOLO
 from dataloader import *
-from feature_extraction import init_feature_extractor
+from feature_extraction import *
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+object_detector = YOLO('yolov8n.pt')  # load an official model
 object_detector = YOLO('yolov9e.pt')  # load an official model
-object_detector = YOLO('https://drive.google.com/file/d/153UJCTQEPKjp_sfvN3ygqQahHTXX60jc/view?usp=share_link')
-feature_extractor = init_feature_extractor(backbone='efficientnet', device=torch.device('cuda'))
+object_detector = YOLO('best.pt')
+feature_extractor = init_feature_extractor(backbone='efficientnet', device=torch.device('mps'))
 
 
 class DSTA(nn.Module):
@@ -28,6 +29,7 @@ class DSTA(nn.Module):
     m: numbers of frames of Dta
     input_dim: dimention of the input to gru
     n_layers: number of attention layers
+    t: number of frames in the video
     output_dim: dimention of the gru output (number of classes)
     n_objects: max number of objects to detect
   forwards:
@@ -44,8 +46,8 @@ class DSTA(nn.Module):
         self.dsa = SpatialAttention(device, n_layers, d)
         self.dta = TemporalAttention(device, d)
         self.gru = GatedRecurrentUnit(device, input_dim, d, output_dim, n_layers)
-        self.h_prev_weighted = nn.Softmax(dim=-1)(torch.randn((t, d), device=device, dtype=torch.bfloat16))
-        self.h_t_prev = torch.zeros((t, d, m), device=device, dtype=torch.bfloat16)
+        self.h_prev_weighted = nn.Softmax(dim=-1)(torch.randn((t, d), device=device, dtype=torch.float32))
+        self.h_t_prev = torch.zeros((t, d, m), device=device, dtype=torch.float32)
         self.with_tsaa = with_tsaa
         self.tsaa = SelfAttentionAggregation(device, t, d)
 
@@ -57,22 +59,22 @@ class DSTA(nn.Module):
                                 feature_extractor=feature_extractor,
                                 object_detector=object_detector,
                                 frame=frames / 255,
-                                n_objects=self.n_objects).to(device).to(torch.bfloat16)
+                                n_objects=self.n_objects).to(device).to(torch.float32)
           frames = nn.functional.interpolate(frames, size=(224, 224), mode='bilinear', align_corners=False)
           f_t = feature_extractor(frames).to(torch.bfloat16)
 
-      f_t = nn.Linear(feature_extractor.dim_feat, self.d, device=device, dtype=torch.bfloat16)(f_t)
+      f_t = nn.Linear(feature_extractor.dim_feat, self.d, device=device, dtype=torch.float32)(f_t)
       f_t = nn.ReLU()(f_t)
 
-      o_t = nn.Linear(feature_extractor.dim_feat, self.d, device=device, dtype=torch.bfloat16)(o_t)
+      o_t = nn.Linear(feature_extractor.dim_feat, self.d, device=device, dtype=torch.float32)(o_t)
       o_t = nn.ReLU()(o_t)
 
       alpha_t = self.dsa(o_t.permute(0, 2, 1), self.h_prev_weighted.unsqueeze(1))
       o_t_weighted = (o_t * alpha_t.unsqueeze(-1)).sum(dim=1)
 
-      x_t = torch.cat((o_t_weighted, f_t), dim=1).to(torch.bfloat16)
+      x_t = torch.cat((o_t_weighted, f_t), dim=1).to(torch.float32)
 
-      h_prev_weighted = self.h_prev_weighted.unsqueeze(0).clone().to(torch.bfloat16)
+      h_prev_weighted = self.h_prev_weighted.unsqueeze(0).clone().to(torch.float32)
       out, h = self.gru(h_prev_weighted.to(torch.float32), x_t.unsqueeze(1).to(torch.float32))
       with torch.no_grad():
         h = h.squeeze(0)
