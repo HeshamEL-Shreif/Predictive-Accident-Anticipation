@@ -21,8 +21,8 @@ class SelfAttentionAggregation(nn.Module):
     def __init__(self, device, t, d):
         super().__init__()
         self.w_saa =  nn.Parameter(torch.randn((1, t), device=device, requires_grad=True, dtype=torch.float32) * 0.01)
-        self.dense1 = nn.Linear(d, 64, device=device, dtype=torch.bfloat16)
-        self.dense2 = nn.Linear(64, 2, device=device, dtype=torch.bfloat16)
+        self.dense1 = nn.Linear(d, 64, device=device, dtype=torch.float32)
+        self.dense2 = nn.Linear(64, 2, device=device, dtype=torch.float32)
 
     def forward(self, h_v):
         z_v = nn.Softmax(dim=-1)(torch.matmul(h_v.T , h_v))
