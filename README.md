@@ -1,37 +1,94 @@
-# Predictive-Accident-Anticipation
+# 🚗 Predictive Accident Anticipation
 
-### Introduction
+## 📌 Introduction
 
-Innovation throughout history has been fueled by humanity's relentless pursuit of safety. Despite tremendous strides, traffic accidents persist as a formidable threat, annually claiming the lives of 1.35 million individuals globally, according to the World Health Organization (WHO). Deep learning emerges as a beacon of hope in our quest to enhance road safety. Its capacity to sift through vast and intricate datasets presents an unprecedented opportunity for anticipating and preventing accidents. However, the true efficacy of deep learning in averting accidents lies not solely in its analytical prowess but in its ability to mirror the nuanced vigilance of human attention. Human cognition excels in discerning subtle cues, recognizing hazards, and swiftly adapting to unforeseen circumstances. Thus, integrating insights from human cognitive faculties into deep learning models becomes imperative for achieving optimal results. This synergy between deep learning and human-like attention mechanisms signifies a paradigm shift in accident anticipation. It transcends mere data analysis to synthesize information with the finesse and intuition inherent in human cognition. The fusion of these technologies holds the promise of not only predicting but proactively preventing accidents before they occur, particularly in the context of autonomous driving. As we delve deeper into the realm of artificial intelligence and autonomous vehicles, the urgency to anticipate accidents intensifies. Reported collisions involving autonomous vehicles underscore he critical need for enhanced safety measures. Leveraging the intricate spatial and temporal data captured by dashboard cameras presents an opportunity to mitigate risks proactively, thus reducing reliance on human attention and bolstering road safety measures significantly. Ultimately, the goal extends beyond prediction to proactive accident prevention. By harnessing the power of computational insights and technological advancements, we aim to minimize the devastating toll of traffic accidents and establish a future where accidents are not just foreseen but actively mitigated. This transformation is not only about introducing innovative technologies but also redefining our approach to road safety, making our roads safer for all.
-### Architecting Precision
+Throughout history, innovation has been driven by humanity's relentless pursuit of safety. Despite significant advancements, **traffic accidents remain a critical global issue**, claiming over **1.35 million lives annually** (WHO). In this context, **deep learning emerges as a powerful tool** to enhance road safety by processing vast, complex datasets to anticipate and prevent accidents.
 
-the incorporation of YOLOv9 as the object detection model enriches the accident anticipation system with robust capabilities to identify multiple objects within each frame of dashcam videos. Renowned for its real-time object detection prowess and accuracy, YOLOv9 operates by leveraging a single convolutional neural network, enabling precise localization and class probability prediction directly from full images in a single inference. Its multi-scale feature extraction and adaptability to object scale variations make it an excellent fit for identifying objects, a fundamental step in the accident anticipation process.
-Meanwhile, EfficientNetV2, a state-of-the-art convolutional neural network architecture, assumes the role of the feature extractor within the system. Comprising efficient building blocks and advanced architecture design, EfficientNetV2 excels in extracting deep and hierarchical features from dashcam video frames. Renowned for its simplicity, effectiveness, and scalability across different model sizes, this network progressively refines features, capturing intricate patterns and hierarchical representations. Leveraging pre-trained weights from the ImageNet dataset, EfficientNetV2 offers a robust foundation for extracting both frame-level and object-level features, crucial for subsequent stages within the accident anticipation network.
-Now, turning our attention to the Dynamic Spatial-temporal Attention (DSTA) network, this complex and interconnected system comprises several key modules working in tandem to anticipate accidents. The process commences with YOLOv9 processing dashcam videos, accurately detecting and localizing multiple objects within each frame. The identified objects then pass through EfficientNetV2, a proficient extractor that meticulously discerns intricate details at both frame and object levels.
-These extracted features, a fusion of frame and object specifics, undergo meticulous amalgamation and precise weighting before reaching the core component, the Gated Recurrent Unit (GRU). The GRU orchestrates a complex symphony by integrating current input features with historically weighted representations, generating a hidden representation pivotal in foreseeing potential accidents in future frames.
-The Dynamic Temporal Attention (DTA) module meticulously analyzes historical representations, assigning attention weights to decode temporal sequences, thereby aiding in predicting potential accident occurrences. Simultaneously, the Dynamic Spatial Attention (DSA) module learns to allocate attention weights, ensuring the precise fusion of object-level features with utmost precision and relevance.
-Moreover, the Temporal Self-Attention Aggregation (TSAA) auxiliary network plays a critical role in discerning and predicting video classes exclusively during the training phase. This intricate orchestration within the DSTA network establishes the backbone of its predictive capabilities, meticulously detailed in forthcoming sections
+However, the success of deep learning in this domain isn't just about data analysis—it must emulate the **subtle attentiveness of human cognition**. Humans excel at interpreting nuanced cues, adapting swiftly, and recognizing potential hazards. By integrating such cognitive insights into deep learning models, we can move closer to **real-time, human-like accident anticipation**.
 
-###  Dataset
-<ul>
-<li>We train the model using <a href="https://drive.google.com/drive/folders/1NUwC-bkka0-iPqhEhIgsXWtj0DA2MR-F?usp=share_link" >CCD(Car Crash Dataset)</a>
-<li>To intiate dataloader you will use ccd_load_data function and give it the path of the dataset and the path of <a href="https://drive.google.com/file/d/13OgrD0-8cKG0X00MlA6JXr0G_JJmHYXg/view?usp=share_link">anotate file</a> 
-<li> dataset must be in the following structure<br>
-  CarCrash<br>
-  |<br>
-    --> Normal (folder includes the Normal videos) <br>
-  |<br>
-    --> Crash (folder includes videos that contains an accident)
+This project introduces a **synergistic architecture** that fuses **spatial-temporal modeling, attention mechanisms, and cutting-edge neural networks** to proactively identify and mitigate accident risks—particularly in autonomous driving systems. By leveraging **dashcam video data**, our system not only predicts accidents but aims to **proactively prevent** them.
 
-</ul>
+---
 
-### Model Training & Testing
-<ul>
-<li>check the path of the YOLOv9 weights in DSTA.py
-<li>check the path of the dataset in train_DSTA.py and cont_train_from_chechpoint.py
-<li> To start training from scratch run the train_DSTA.py File
-<li>  To continue training from checkpoint run the cont_train_from_chechpoint.py file and change the path of the checkpoint file in the code
-<li> To test the model run the test_model.py file and change the path of the checkpoint file in the code and the path of video to test on it or use it throw the user interface by running the index.html file
+## 🧠 System Architecture
+![arch](image.png)
+
+### 1. YOLOv9 – Real-Time Object Detection
+- **Role**: Detects and localizes multiple objects in each dashcam frame.
+- **Why YOLOv9?** Known for its real-time performance and accuracy, YOLOv9 uses a single CNN to generate bounding boxes and class predictions in one forward pass. It handles multi-scale detection and object variability effectively.
+
+### 2. EfficientNetV2 – Feature Extraction
+- **Role**: Extracts deep, hierarchical features from video frames and detected objects.
+- **Strengths**: Lightweight, scalable, and pre-trained on ImageNet, EfficientNetV2 efficiently encodes rich frame-level and object-level information.
+
+### 3. DSTA Network – Dynamic Spatio-Temporal Attention
+
+The **Dynamic Spatio-Temporal Attention (DSTA)** network forms the predictive backbone of the system and consists of the following modules:
+
+#### 🔄 Feature Integration
+- **YOLOv9** detects and localizes objects.
+- **EfficientNetV2** extracts and fuses frame and object features.
+
+#### 🔁 GRU (Gated Recurrent Unit)
+- Integrates current features with historical context to form temporally aware hidden representations that forecast future risk.
+
+#### 🧭 Attention Modules
+- **Dynamic Temporal Attention (DTA)**: Weighs historical features to capture relevant motion cues over time.
+- **Dynamic Spatial Attention (DSA)**: Learns to selectively focus on object features based on spatial context.
+- **Temporal Self-Attention Aggregation (TSAA)**: Used during training to enhance the network’s capacity to learn video-level class semantics.
+
+Together, these modules allow the system to **analyze evolving scenes**, capturing spatial dynamics and motion patterns to **anticipate accidents with high precision**.
+
+---
+
+## 📦 Dataset
+
+The model is trained on the **Car Crash Dataset (CCD)**.  
+The dataset directory should follow this structure:
+```text
+CarCrash/
+├── Normal/   # Videos without accidents
+└── Crash/    # Videos containing accidents
+```
+### ⚙️ Loading the Dataset
+Use the `ccd_load_data` function by providing:
+- The path to the dataset directory
+- The path to the annotation file
+
+---
+
+## 🛠️ Model Training & Evaluation
+
+### ✅ Before You Begin
+- Ensure the following paths are set correctly:
+  - **YOLOv9 weights** in `DSTA.py`
+  - **CCD dataset** in `train_DSTA.py` and `cont_train_from_checkpoint.py`
+
+### 🏋️ Training
+To train the model from scratch:
+
+```bash
+python train_DSTA.py
+```
+
+``` bash
+# Update checkpoint path inside the script first
+python cont_train_from_checkpoint.py
+```
+
+## 🎯 Testing
+
+To test the model:
+1. 	Update paths in test_model.py:
+- Path to the checkpoint file
+-	Path to the video for testing
+
+2.	Run the test script:
+
+```bash
+python test_model.py
+```
+
 <li> Videos to test DSTA on it found in <a href="https://drive.google.com/drive/folders/1ILrw5lAQRBWUN7sh6hHQcgV-2mpAJIUe?usp=share_link">drive</a>
 </ul>
 
@@ -44,7 +101,4 @@ Moreover, the Temporal Self-Attention Aggregation (TSAA) auxiliary network plays
 <li> YOLOv9 Notebook included in the repository
 <li> YOLOv9 weights included on the <a href="https://drive.google.com/file/d/153UJCTQEPKjp_sfvN3ygqQahHTXX60jc/view?usp=share_link">drive</a>
 </ul>
-
-
-
 
